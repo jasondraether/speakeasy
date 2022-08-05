@@ -27,7 +27,9 @@ def load_model(weights_fpath: Path, device=None):
     #   was saved on. Worth investigating.
     global _model, _device
     if device is None:
-        _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # Temporary
+        _device = torch.device("cpu")
+        #_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     elif isinstance(device, str):
         _device = torch.device(device)
     
@@ -37,10 +39,10 @@ def load_model(weights_fpath: Path, device=None):
     # _model.load_state_dict(checkpoint["state_dict"])
     # _model.eval()
     _model = SpeakerEncoder(_device, torch.device("cpu"))
-    checkpoint = torch.load(str(weights_fpath))
+    checkpoint = torch.load(str(weights_fpath), map_location=torch.device("cpu"))
     _model.load_state_dict(checkpoint["model_state"])
     _model.eval()
-    print("Loaded encoder \"%s\" trained to step %d" % (weights_fpath.name, checkpoint["step"]))
+    print("Loaded encoder \"%s\" trained to step %d" % (weights_fpath, checkpoint["step"]))
     # print("Loaded encoder \"%s\" trained to epoch %d" % (weights_fpath.name, checkpoint["epoch"]))
     
     

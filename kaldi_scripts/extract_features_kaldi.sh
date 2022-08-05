@@ -6,19 +6,19 @@
 DATA_ROOT=$1
 
 # Some semi-constant variables.
-KALDI_ROOT=/mnt/data1/anurag/kaldi
-PRETRAIN_ROOT=/mnt/data1/waris/models/librispeech_am/0013_librispeech_v1
+KALDI_ROOT=/home/jason/workspace/kaldi/
+PRETRAIN_ROOT=/home/jason/workspace/speakeasy/accentron_models/0013_librispeech_v1/
 AM_ROOT=$PRETRAIN_ROOT/exp/chain_cleaned/tdnn_1d_sp
 IE_ROOT=$PRETRAIN_ROOT/exp/nnet3_cleaned/extractor
 LANG_CHAIN_ROOT=$PRETRAIN_ROOT/data/lang_chain
 LANG_TGLARGE_ROOT=$PRETRAIN_ROOT/data/lang_test_tglarge
 BNF_NODE=prefinal-chain.linear
-SCRIPT_ROOT=/home/grads/q/quamer.waris/projects/Accentron/kaldi_scripts
+SCRIPT_ROOT=/home/jason/workspace/speakeasy/kaldi_scripts/
 
 # Call create kaldi files to create all the required kaldi files such as wav.scp
 # It also tries to fix the oovs there. It treats each utterance as a separate
 # speaker to extract utterance-level ivectors.
-python $SCRIPT_ROOT/create_kaldi_files.py $DATA_ROOT
+python3 $SCRIPT_ROOT/create_kaldi_files.py $DATA_ROOT
 
 # For the rest of the operations we will do it under kaldi/egs/librispeech/s5
 cd $KALDI_ROOT/egs/librispeech/s5 || exit 1;

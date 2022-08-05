@@ -15,7 +15,7 @@ class Synthesizer:
     sample_rate = hparams.sample_rate
     hparams = hparams
     
-    def __init__(self, checkpoints_dir: Path, verbose=True, low_mem=False):
+    def __init__(self, checkpoint_fpath: Path, verbose=True, low_mem=False):
         """
         Creates a synthesizer ready for inference. The actual model isn't loaded in memory until
         needed or until load() is called.
@@ -31,16 +31,9 @@ class Synthesizer:
         self._low_mem = low_mem
         
         # Prepare the model
-        self._model = None  # type: Tacotron2
-        checkpoint_state = tf.compat.v1.train.get_checkpoint_state(checkpoints_dir)
-        if checkpoint_state is None:
-            raise Exception("Could not find any synthesizer weights under %s" % checkpoints_dir)
-        self.checkpoint_fpath = checkpoint_state.model_checkpoint_path
-        if verbose:
-            model_name = checkpoints_dir.parent.name.replace("logs-", "")
-            step = int(self.checkpoint_fpath[self.checkpoint_fpath.rfind('-') + 1:])
-            print("Found synthesizer \"%s\" trained to step %d" % (model_name, step))
-     
+        self._model = None
+        self.checkpoint_fpath = checkpoint_fpath
+
     def is_loaded(self):
         """
         Whether the model is loaded in GPU memory.
