@@ -155,5 +155,6 @@ class KaldiInterface(object):
 
     def _get_bnf(self, utt_id):
         # T*D float32 ndarray.
-        return get_ele_if_exist(utt_id, self._bnf_scp).astype(np.float32)
+        ele = get_ele_if_exist(utt_id, self._bnf_scp)
+        return None if ele is None else ele.astype(np.float32)
 

@@ -86,7 +86,6 @@ class Tacotron2:
             [self.mel_outputs, self.alignments, self.stop_token_prediction],
             feed_dict=feed_dict)
         mels, alignments, stop_tokens = list(mels[0]), alignments[0], stop_tokens[0]
-        
         # Trim the output
         for i in range(len(mels)):
             try:
