@@ -1,33 +1,38 @@
-# Voice Conversion Using Zero-Shot Learning
+# Speaker Anonymization using Voice Conversion
+This implementation uses voice conversion forked from [here](https://github.com/warisqr007/voice-conversion), which was originally adapted from [here](https://github.com/CorentinJ/Real-Time-Voice-Cloning) to perform speaker anonymization. We define a source speaker as the individual who we wish to anonymize but preserve their linguistic information (i.e., the words they speak) as well as the emotional affect (e.g., sadness, happiness, anger) contained in their original utterance.
 
-This is a TensorFlow + Pytorch implementation. This implementation is adapted from the Real Time Voice Clone implementation at https://github.com/CorentinJ/Real-Time-Voice-Cloning.
+## Setup (for Ubuntu 20.04 LTS)
+**Python** 
+1. Install Python 3.8.
+2. Setup a virtual environment `python -m venv env` and activate the environment `source env/bin/activate`.
+3. Install requirements `pip install -r requirements.txt`.
+4. Configure CUDA to work with PyTorch and Tensorflow. This varies based on your GPU and your setup, so this step is left up to you. CUDA isn't necessary, but the code will require some modifications if CUDA isn't enabled.
+**Kaldi**
+5. Clone Kaldi repository `git clone https://github.com/kaldi-asr.git kaldi --origin upstream` and enter repo folder `cd kaldi`.
+6. Follow `INSTALL.md` instructions in the root folder (go to `tools/`, follow `INSTALL.md` instructions there, then go to `src/` and follow `INSTALL.md` instructions there).
+**Models**
+7. Install all of the required models
+7.1 Encoder, Vocoder, Synthesizer, and Acoustic models can be downloaded [here](https://drive.google.com/file/d/1HdHqIk3ij2h9m5NqfgWK19OJqEGAgoJv/view?usp=sharing). The Encoder, Vocoder, and Synthesizer are originally from [LibriSpeech](https://www.openslr.org/12), and the Synthesizer is from [ARCTIC](http://www.festvox.org/cmu_arctic/) and [L2-ARCTIC](https://psi.engr.tamu.edu/l2-arctic-corpus/). 
+7.2 Mozilla Deep Speech can be downloaded [here](https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.pbmm) for the model and [here](https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.scorer) for the scorer.
 
-## Installation
+**Dataset** 
+8. The dataset used is the DAIC dataset. You must request access for it first. See [here](https://dcapswoz.ict.usc.edu/) for more information.
+9. Once you have the dataset, you can use the `format-dataset.py` script to format it. Change paths in the script as needed.
 
-1. Python 3.8
-* Install [PyTorch](https://pytorch.org/get-started/locally/) (>=1.0.1).
-* Install Nvidia version of [TensorFlow 1.15](https://github.com/NVIDIA/tensorflow)
-* Install [ffmpeg](https://ffmpeg.org/download.html#get-packages).
-* Install [Kaldi](https://github.com/kaldi-asr/kaldi)
-* Install [PyKaldi](https://github.com/pykaldi/pykaldi)
-* Run `pip install -r requirements.txt` to install the remaining necessary packages.
-* Download pretrained [TDNN-F model](https://kaldi-asr.org/models/13/0013_librispeech_v1_chain.tar.gz), extract it, and set `PRETRAIN_ROOT` in `kaldi_scripts/extract_features_kaldi.sh` to the pretrained model directory.
+**Setting Paths**
+10. There are a few paths you have to set in the code.
+10.1 In `kaldi_scripts/extract_features_kaldi.sh`, set `KALDI_ROOT` equal to the path of your Kaldi installation (e.g., `KALDI_ROOT=/home/user/path/to/kaldi/`), set `PRETRAIN_ROOT` equal to the path of the acaoustic model you downloaded in step 7.1 (e.g., `PRETRAIN_ROOT=/home/user/path/to/0013_librispeech_v1/`, and set `SCRIPT_ROOT` equal to the path of the `extract_features_kaldi.sh` script (e.g., `SCRIPT_ROOT=/home/user/path/to/kaldi_scripts/`)
+10.2 In `inference_script.py`, set `dataset_dir` equal to the path of your formatted dataset (a folder of a list of speakers that each have a `wav/` and `kaldi/` folder in them, e.g., `/path/to/daic/speaker_350/wav/1.wav`. Set `encoder_speaker_weights` to the path of the encoder (should end in `pretrained.pt`. Set `vocoder_weights` equal to the path of the vocoder (should end in `pretrained.pt`). Set `syn_dir` equal to the path of your synthesizer (mine was `[...]/tacotron_pretrained_l2arctic/tacotron_model.ckpt-204001`), set `stt_model_path` and `stt_scorer_path` equal to the `.pbmm` and `.scorer` files you downloaded from Mozilla, and make sure `results_path` points to a valid folder (you can leave the filename generated based on datetime if you want, or change it).
 
-## Dataset
+**Formatting and Preprocessing**
+11. To format the dataset for use with `inference_script.py` and `extract_features_kaldi.sh`, run the `format_dataset.py` script, setting the `source_dir` variable to the path which has the folder containing the utterances for all speakers (e.g., `daic/`, where `speaker_350_uttr5.wav`, `speaker_371_uttr10.wav`, etc. is). Set the `output_dir` variable to the folder where you'd like to output the formatted dataset. The folder needs to exist first.
 
-* Acoustic Model: [LibriSpeech](https://www.openslr.org/12). Download pretrained TDNN-F acoustic model [here](https://kaldi-asr.org/models/13/0013_librispeech_v1_chain.tar.gz).
-  * You also need to set `KALDI_ROOT` and `PRETRAIN_ROOT` in `kaldi_scripts/extract_features_kaldi.sh` accordingly.
-* Speaker Encoder: [LibriSpeech](https://www.openslr.org/12), see [here](https://github.com/CorentinJ/Real-Time-Voice-Cloning) for detailed training process.
-* Synthesizer (i.e., Seq2seq model): [ARCTIC](http://www.festvox.org/cmu_arctic/) and [L2-ARCTIC](https://psi.engr.tamu.edu/l2-arctic-corpus/). Please see [here]() for a merged version.
-* Vocoder: [LibriSpeech](https://www.openslr.org/12), see [here](https://github.com/CorentinJ/Real-Time-Voice-Cloning) for detailed training process.
+12. To extract features using `extract_features_kaldi.sh`, after you've formatted the dataset, make sure `extract_features_kaldi.sh` is an executable (`chmod +x extract_features_kaldi.sh` if not), and run it as `./extract_features_kaldi.sh /absolute/path/to/speaker/folder/`. You'll likely need to run this for multiple speakers, so you can do something like `for s in /output_folder/*; do ./extract_features_kaldi.sh /output_folder/${s}; done;` in the terminal. A folder called `kaldi/` will be added to each speaker in `/output_folder/`.
 
-All the pretrained the models are available [here](https://drive.google.com/file/d/1HdHqIk3ij2h9m5NqfgWK19OJqEGAgoJv/view?usp=sharing)
+**Running**
+13. Once everything is setup, simply run `python inference_script.py` to start generating results. The results will end up in the folder according to `results_path`.
 
-## Quick Start
-
-See [the inference script](inference_script.ipynb)
-
-## Training
+**(Old, for reference) Training**
 
 * Use Kaldi to extract BNF for the reference L1 speaker
 ```

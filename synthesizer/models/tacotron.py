@@ -303,28 +303,28 @@ class Tacotron():
         
         self.all_vars = tf.compat.v1.trainable_variables()
         
-        log("Initialized Tacotron model. Dimensions (? = dynamic shape): ")
-        log("  Train mode:               {}".format(is_training))
-        log("  Eval mode:                {}".format(is_evaluating))
-        log("  GTA mode:                 {}".format(gta))
-        log("  Synthesis mode:           {}".format(not (is_training or is_evaluating)))
-        log("  Input:                    {}".format(inputs.shape))
-        for i in range(hp.tacotron_num_gpus):
-            log("  device:                   {}".format(i + hp.tacotron_gpu_start_idx))
-            log("  embedding:                {}".format(tower_embedded_inputs[i].shape))
-            log("  enc conv out:             {}".format(tower_enc_conv_output_shape[i]))
-            log("  encoder out (cond):       {}".format(tower_encoder_cond_outputs[i].shape))
-            log("  decoder out:              {}".format(self.tower_decoder_output[i].shape))
-            log("  residual out:             {}".format(tower_residual[i].shape))
-            log("  projected residual out:   {}".format(tower_projected_residual[i].shape))
-            log("  mel out:                  {}".format(self.tower_mel_outputs[i].shape))
-            if post_condition:
-                log("  linear out:               {}".format(self.tower_linear_outputs[i].shape))
-            log("  <stop_token> out:         {}".format(self.tower_stop_token_prediction[i].shape))
+        # log("Initialized Tacotron model. Dimensions (? = dynamic shape): ")
+        # log("  Train mode:               {}".format(is_training))
+        # log("  Eval mode:                {}".format(is_evaluating))
+        # log("  GTA mode:                 {}".format(gta))
+        # log("  Synthesis mode:           {}".format(not (is_training or is_evaluating)))
+        # log("  Input:                    {}".format(inputs.shape))
+        # for i in range(hp.tacotron_num_gpus):
+        #     log("  device:                   {}".format(i + hp.tacotron_gpu_start_idx))
+        #     log("  embedding:                {}".format(tower_embedded_inputs[i].shape))
+        #     log("  enc conv out:             {}".format(tower_enc_conv_output_shape[i]))
+        #     log("  encoder out (cond):       {}".format(tower_encoder_cond_outputs[i].shape))
+        #     log("  decoder out:              {}".format(self.tower_decoder_output[i].shape))
+        #     log("  residual out:             {}".format(tower_residual[i].shape))
+        #     log("  projected residual out:   {}".format(tower_projected_residual[i].shape))
+        #     log("  mel out:                  {}".format(self.tower_mel_outputs[i].shape))
+        #     if post_condition:
+        #         log("  linear out:               {}".format(self.tower_linear_outputs[i].shape))
+        #     log("  <stop_token> out:         {}".format(self.tower_stop_token_prediction[i].shape))
             
-            # 1_000_000 is causing syntax problems for some people?! Python please :)
-            log("  Tacotron Parameters       {:.3f} Million.".format(
-                np.sum([np.prod(v.get_shape().as_list()) for v in self.all_vars]) / 1000000))
+        #     # 1_000_000 is causing syntax problems for some people?! Python please :)
+        #     log("  Tacotron Parameters       {:.3f} Million.".format(
+        #         np.sum([np.prod(v.get_shape().as_list()) for v in self.all_vars]) / 1000000))
     
     
     def add_loss(self):

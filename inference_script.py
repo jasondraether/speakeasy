@@ -46,7 +46,7 @@ from encoder import inference as encoder
 from vocoder import inference as vocoder
 
 # Constants
-DATUM_SIZE = 8 # The total number of utterances to use for testing + pool
+DATUM_SIZE = 16 # The total number of utterances to use for testing + pool
 # E.g., if DATUM_SIZE = 8, then 4 utterances are used for source and target speakers and 4 are for their respective pools
 dataset_dir = "/home/jason/workspace/datasets/daic/clean/train/" # Path to DAIC datasest
 encoder_speaker_weights = "/home/jason/workspace/speakeasy/models/encoder/saved_models/pretrained.pt" # Path to encoder .pt file
@@ -232,7 +232,7 @@ try:
             source_utterance_path = os.path.join(wav_dir, f'{source_utterance_num}.wav')
 
             # Feel free to truncate the target speakers since the script may take too long (I have it set to 5 here)
-            for target_speaker in target_speakers[:5]:
+            for target_speaker in target_speakers[:10]:
                 print(f'===== On target speaker {target_speaker} =====')
                 target_dir = os.path.join(dataset_dir, target_speaker, 'wav/')
                 # Read the target speaker utterances
