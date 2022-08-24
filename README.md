@@ -1,6 +1,8 @@
 # Speaker Anonymization using Voice Conversion
 This implementation uses voice conversion forked from [here](https://github.com/warisqr007/voice-conversion), which was originally adapted from [here](https://github.com/CorentinJ/Real-Time-Voice-Cloning) to perform speaker anonymization. We define a source speaker as the individual who we wish to anonymize but preserve their linguistic information (i.e., the words they speak) as well as the emotional affect (e.g., sadness, happiness, anger) contained in their original utterance.
 
+We take the BNF of the source utterance and concatenate it with the embedding of the target speaker, and use the synthesizer to generate a spectrogram and a vocoder to generate a waveform from the spectrogram.
+
 ## Things to know 
 The .wav files in the DAIC dataset are 16-bit PCM (i.e., 16-bit integers) monosampled at 16000 Hz. The output of the Tacotron synthesizer is 32-bit float, but is converted back into 16-bit PCM for you in the `inference_script.py` code.
 
