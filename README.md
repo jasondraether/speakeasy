@@ -25,9 +25,9 @@ Also, `speechbrain` (the speaker verification system) will make symbolic links t
 
 7. Install all of the required models
     
-    7.1 Encoder, Vocoder, Synthesizer, and Acoustic models can be downloaded [here](https://drive.google.com/file/d/1HdHqIk3ij2h9m5NqfgWK19OJqEGAgoJv/view?usp=sharing). The Encoder, Vocoder, and Synthesizer are originally from [LibriSpeech](https://www.openslr.org/12), and the Synthesizer is from [ARCTIC](http://www.festvox.org/cmu_arctic/) and [L2-ARCTIC](https://psi.engr.tamu.edu/l2-arctic-corpus/). 
+    7.1. Encoder, Vocoder, Synthesizer, and Acoustic models can be downloaded [here](https://drive.google.com/file/d/1HdHqIk3ij2h9m5NqfgWK19OJqEGAgoJv/view?usp=sharing). The Encoder, Vocoder, and Synthesizer are originally from [LibriSpeech](https://www.openslr.org/12), and the Synthesizer is from [ARCTIC](http://www.festvox.org/cmu_arctic/) and [L2-ARCTIC](https://psi.engr.tamu.edu/l2-arctic-corpus/). 
     
-    7.2 Mozilla Deep Speech can be downloaded [here](https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.pbmm) for the model and [here](https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.scorer) for the scorer.
+    7.2. Mozilla Deep Speech can be downloaded [here](https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.pbmm) for the model and [here](https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.scorer) for the scorer.
 
 **Dataset** 
 
@@ -38,9 +38,9 @@ Also, `speechbrain` (the speaker verification system) will make symbolic links t
 
 10. There are a few paths you have to set in the code.
     
-    10.1 In `kaldi_scripts/extract_features_kaldi.sh`, set `KALDI_ROOT` equal to the path of your Kaldi installation (e.g., `KALDI_ROOT=/home/user/path/to/kaldi/`), set `PRETRAIN_ROOT` equal to the path of the acaoustic model you downloaded in step 7.1 (e.g., `PRETRAIN_ROOT=/home/user/path/to/0013_librispeech_v1/`, and set `SCRIPT_ROOT` equal to the path of the `extract_features_kaldi.sh` script (e.g., `SCRIPT_ROOT=/home/user/path/to/kaldi_scripts/`)
+    10.1. In `kaldi_scripts/extract_features_kaldi.sh`, set `KALDI_ROOT` equal to the path of your Kaldi installation (e.g., `KALDI_ROOT=/home/user/path/to/kaldi/`), set `PRETRAIN_ROOT` equal to the path of the acaoustic model you downloaded in step 7.1 (e.g., `PRETRAIN_ROOT=/home/user/path/to/0013_librispeech_v1/`, and set `SCRIPT_ROOT` equal to the path of the `extract_features_kaldi.sh` script (e.g., `SCRIPT_ROOT=/home/user/path/to/kaldi_scripts/`)
    
-    10.2 In `inference_script.py`, set `dataset_dir` equal to the path of your formatted dataset (a folder of a list of speakers that each have a `wav/` and `kaldi/` folder in them, e.g., `/path/to/daic/speaker_350/wav/1.wav`. Set `encoder_speaker_weights` to the path of the encoder (should end in `pretrained.pt`. Set `vocoder_weights` equal to the path of the vocoder (should end in `pretrained.pt`). Set `syn_dir` equal to the path of your synthesizer (mine was `[...]/tacotron_pretrained_l2arctic/tacotron_model.ckpt-204001`), set `stt_model_path` and `stt_scorer_path` equal to the `.pbmm` and `.scorer` files you downloaded from Mozilla, and make sure `results_path` points to a valid folder (you can leave the filename generated based on datetime if you want, or change it).
+    10.2. In `inference_script.py`, set `dataset_dir` equal to the path of your formatted dataset (a folder of a list of speakers that each have a `wav/` and `kaldi/` folder in them, e.g., `/path/to/daic/speaker_350/wav/1.wav`. Set `encoder_speaker_weights` to the path of the encoder (should end in `pretrained.pt`. Set `vocoder_weights` equal to the path of the vocoder (should end in `pretrained.pt`). Set `syn_dir` equal to the path of your synthesizer (mine was `[...]/tacotron_pretrained_l2arctic/tacotron_model.ckpt-204001`), set `stt_model_path` and `stt_scorer_path` equal to the `.pbmm` and `.scorer` files you downloaded from Mozilla, and make sure `results_path` points to a valid folder (you can leave the filename generated based on datetime if you want, or change it).
 
 **Formatting and Preprocessing**
 
