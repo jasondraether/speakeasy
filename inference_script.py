@@ -46,7 +46,8 @@ from encoder import inference as encoder
 from vocoder import inference as vocoder
 
 # Constants
-DATUM_SIZE = 16 # The total number of utterances to use for testing + pool
+DATUM_SIZE = 10 # The total number of utterances to use for testing + pool
+DATUM_SIZE_TAR = 4
 # E.g., if DATUM_SIZE = 8, then 4 utterances are used for source and target speakers and 4 are for their respective pools
 dataset_dir = "/home/jason/workspace/datasets/daic/clean/train/" # Path to DAIC datasest
 encoder_speaker_weights = "/home/jason/workspace/speakeasy/models/encoder/saved_models/pretrained.pt" # Path to encoder .pt file
@@ -151,7 +152,7 @@ def process_batch(bnf, target_path, target_pool, target_speaker, source_path, so
         batch_results.append(verify_converted(temp_path, f, source_speaker, target_speaker, True, 'CONV-TARGET_POOL'))
     # Compare converted utterance with source utterances from test pool (CONV-SOURCE_POOL)
     for f in source_pool:
-        batch_results.append(verify_converted(temp_path, f, source_speaker, target_speaker, True, 'CONV-SOURCE_POOL'))
+        batch_results.append(verify_converted(temp_path, f, source_speaker, target_speaker, False, 'CONV-SOURCE_POOL'))
 
     return batch_results
 
@@ -204,14 +205,16 @@ try:
         # Read list of source speaker utterances
         source_utterances = os.listdir(wav_dir)
         if len(source_utterances) < DATUM_SIZE:
-            print(f'Not enough utterances for source speaker {source_speaker}. Check dataset.')
-            continue
+            print(f'Not enough utterances for source speaker {source_speaker}. Truncating.')
+            source_datum_size = len(source_utterances)
+        else:
+            source_datum_size = DATUM_SIZE
         # Shuffle the utterances for random
         shuffle(source_utterances)
         # Only select a subset of source utterances. Use half for converting and other half for testing
-        source_utterances = source_utterances[:DATUM_SIZE]
-        batch_source_utterances = source_utterances[:DATUM_SIZE//2]
-        test_source_utterances = source_utterances[DATUM_SIZE//2:]
+        source_utterances = source_utterances[:source_datum_size]
+        batch_source_utterances = source_utterances[:source_datum_size//2]
+        test_source_utterances = source_utterances[source_datum_size//2:]
         # Generate the full paths to the source utterances we're using for the source utterance pool
         test_source_utterance_paths = [os.path.join(wav_dir, utt) for utt in test_source_utterances]
         # Generate the numbers for the source utterances we're using for converting
@@ -232,24 +235,26 @@ try:
             source_utterance_path = os.path.join(wav_dir, f'{source_utterance_num}.wav')
 
             # Feel free to truncate the target speakers since the script may take too long (I have it set to 5 here)
-            for target_speaker in target_speakers[:10]:
+            for target_speaker in target_speakers[:1]:
                 print(f'===== On target speaker {target_speaker} =====')
                 target_dir = os.path.join(dataset_dir, target_speaker, 'wav/')
                 # Read the target speaker utterances
                 target_utterances = os.listdir(target_dir)
-                if len(target_utterances) < DATUM_SIZE:
-                    print(f'Not enough utterances for target speaker {target_speaker}. Check dataset.')
-                    continue
+                if len(target_utterances) < DATUM_SIZE_TAR:
+                    print(f'Not enough utterances for target speaker {target_speaker}. Truncating.')
+                    target_datum_size = len(target_utterances)
+                else:
+                    target_datum_size = DATUM_SIZE_TAR
                 # Shuffle utterance, split into test and pool utterances (same as before w/ source)
                 shuffle(target_utterances)
-                target_utterances = target_utterances[:DATUM_SIZE]
-                batch_target_utterances = target_utterances[:DATUM_SIZE//2]
-                test_target_utterances = target_utterances[DATUM_SIZE//2:]
+                target_utterances = target_utterances[:target_datum_size]
+                batch_target_utterances = target_utterances[:target_datum_size//2]
+                test_target_utterances = target_utterances[target_datum_size//2:]
                 test_target_utterance_paths = [os.path.join(target_dir, utt) for utt in test_target_utterances]
                 # Now, go through source test utterances and target test utterances and convert. Then
                 # check the conversion against the source pool utterances and target pool utterances
                 for j, target_utterance in enumerate(batch_target_utterances):
-                    print(f'===== Target Utterance {j+1}/{DATUM_SIZE//2} =====')
+                    print(f'===== Target Utterance {j+1}/{DATUM_SIZE_TAR//2} =====')
                     target_utterance_path = os.path.join(target_dir, target_utterance)
                     try:
                         sample_results = process_batch(
